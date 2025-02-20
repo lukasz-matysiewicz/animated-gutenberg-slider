@@ -1,0 +1,43 @@
+// Variables
+$gap-width: var(--ags-gap-width, 40px) !default;
+$logo-width: var(--ags-logo-width, 150px) !default;
+$mobile-logo-width: var(--ags-mobile-logo-width, 100px) !default;
+$transition-duration: 0.3s !default;
+
+// Main container
+.cgs-container {
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    
+    .wp-block-column {
+        display: flex !important;
+        flex-direction: row;
+        gap: $gap-width;
+        margin-bottom: -10px !important;
+    }
+    
+    .wp-block-image {
+        flex: 0 0 auto;
+        margin: 2em 0 !important;
+        
+        img {
+            width: $logo-width !important;
+            object-fit: contain;
+            transition: filter $transition-duration ease-in-out;
+            
+            @media (max-width: 992px) {
+                width: $mobile-logo-width !important;
+            }
+            
+            &.grayscale {
+                filter: grayscale(1);
+                
+                &:hover {
+                    filter: grayscale(0);
+                }
+            }
+        }
+    }
+}
