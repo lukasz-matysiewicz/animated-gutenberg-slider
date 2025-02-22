@@ -1,6 +1,8 @@
 <?php
 namespace AGS\Core;
-
+if (!defined('ABSPATH')) {
+    exit('Direct access not allowed.');
+}
 class AGS_Assets {
     private $gsap_version = '3.12.2';
 
@@ -10,8 +12,23 @@ class AGS_Assets {
     }
 
     public function register_frontend_assets() {
-        // Register GSAP Core
-        wp_enqueue_script(
+        if (!$this->should_load_gallery_assets()) {
+            return;
+        }
+    
+        // Get settings
+        $settings = get_option('ags_settings', [
+            'animation_duration' => 30,
+            'animation_direction' => 'left',
+            'use_grayscale' => true,
+            'gap_width' => 40,
+            'logo_width' => 150,
+            'mobile_logo_width' => 100,
+            'transition_duration' => 0.3
+        ]);
+    
+        // Register GSAP
+        wp_register_script(
             'gsap',
             'https://cdnjs.cloudflare.com/ajax/libs/gsap/' . $this->gsap_version . '/gsap.min.js',
             [],
@@ -19,56 +36,49 @@ class AGS_Assets {
             true
         );
     
-        // Register public styles
-        wp_enqueue_style(
+        // Register plugin styles
+        wp_register_style(
             'ags-public',
             AGS_PLUGIN_URL . 'assets/css/ags-public.css',
             [],
             AGS_VERSION
         );
     
-        // Get saved settings with defaults
-        $saved_settings = get_option('ags_settings', [
-            'animation_duration' => 30,
-            'animation_direction' => 'left',
-            'use_grayscale' => true,
-            'gap_width' => 40,
-            'logo_width' => 150,
-            'mobile_logo_width' => 100
-        ]);
-    
-        // Add inline CSS variables
-        $custom_css = sprintf(
-            '.cgs-container {
-                --ags-gap-width: %dpx;
-                --ags-logo-width: %dpx;
-                --ags-mobile-logo-width: %dpx;
-            }',
-            $saved_settings['gap_width'],
-            $saved_settings['logo_width'],
-            $saved_settings['mobile_logo_width']
-        );
-    
-        wp_add_inline_style('ags-public', $custom_css);
-    
-        // Animation settings for JavaScript
-        $animation_settings = [
-            'duration' => absint($saved_settings['animation_duration']),
-            'direction' => $saved_settings['animation_direction'],
-            'useGrayscale' => (bool)$saved_settings['use_grayscale']
-        ];
-    
-        // Register public script
-        wp_enqueue_script(
-            'ags-public',
-            AGS_PLUGIN_URL . 'assets/js/ags-public.js',
-            ['jquery', 'gsap'],
+        // Register plugin scripts
+        wp_register_script(
+            'ags-animations',
+            AGS_PLUGIN_URL . 'assets/js/ags-animations.js',
+            ['gsap'],
             AGS_VERSION,
             true
         );
     
+        wp_register_script(
+            'ags-public',
+            AGS_PLUGIN_URL . 'assets/js/ags-public.js',
+            ['jquery', 'gsap', 'ags-animations'],
+            AGS_VERSION,
+            true
+        );
+    
+        // Enqueue all assets
+        wp_enqueue_style('ags-public');
+        wp_enqueue_script('gsap');
+        wp_enqueue_script('ags-animations');
+        wp_enqueue_script('ags-public');
+    
         // Pass settings to JavaScript
-        wp_localize_script('ags-public', 'agsSettings', $animation_settings);
+        wp_localize_script('ags-public', 'agsSettings', [
+            'pluginUrl' => AGS_PLUGIN_URL,
+            'settings' => [
+                'duration' => intval($settings['animation_duration']),
+                'direction' => $settings['animation_direction'],
+                'useGrayscale' => (bool) $settings['use_grayscale'],
+                'gapWidth' => intval($settings['gap_width']),
+                'logoWidth' => intval($settings['logo_width']),
+                'mobileLogoWidth' => intval($settings['mobile_logo_width'])
+            ]
+        ]);
     }
 
     public function register_admin_assets($hook) {
@@ -76,6 +86,19 @@ class AGS_Assets {
             return;
         }
 
+        // Register and enqueue GSAP first
+        wp_register_script(
+            'gsap',
+            'https://cdnjs.cloudflare.com/ajax/libs/gsap/' . $this->gsap_version . '/gsap.min.js',
+            [],
+            $this->gsap_version,
+            true
+        );
+
+        // Add GSAP fallback
+        wp_add_inline_script('gsap', $this->get_gsap_fallback_script(), 'before');
+
+        // Register admin styles
         wp_enqueue_style(
             'ags-admin',
             AGS_PLUGIN_URL . 'assets/css/ags-admin.css',
@@ -83,12 +106,102 @@ class AGS_Assets {
             AGS_VERSION
         );
 
+        // Register admin scripts with GSAP dependency
+        wp_enqueue_script('gsap');
         wp_enqueue_script(
             'ags-admin',
             AGS_PLUGIN_URL . 'assets/js/ags-admin.js',
-            ['jquery'],
+            ['jquery', 'gsap'],
             AGS_VERSION,
             true
         );
+
+        // Pass plugin URL to JavaScript
+        wp_localize_script('ags-admin', 'agsSettings', [
+            'pluginUrl' => AGS_PLUGIN_URL
+        ]);
+    }
+
+    private function get_gsap_fallback_script() {
+        return "
+            window.addEventListener('error', function(e) {
+                if (e.target.src && e.target.src.includes('cdnjs.cloudflare.com/ajax/libs/gsap')) {
+                    var script = document.createElement('script');
+                    script.src = '" . AGS_PLUGIN_URL . "assets/js/fallback/gsap.min.js';
+                    document.head.appendChild(script);
+                    e.preventDefault();
+                }
+            }, true);
+        ";
+    }
+
+    private function should_load_gallery_assets() {
+        // Skip if we're in admin
+        if (is_admin()) {
+            return false;
+        }
+    
+        // Always load on singular pages
+        if (is_singular()) {
+            global $post;
+            
+            // Check for our container class in content
+            if (strpos($post->post_content, 'ags-container') !== false) {
+                return true;
+            }
+            
+            // Check for columns block
+            if (has_block('core/columns', $post)) {
+                return true;
+            }
+        }
+    
+        // Check for the class in widgets
+        if ($this->check_widgets_for_slider()) {
+            return true;
+        }
+    
+        return false;
+    }
+
+    private function check_widgets_for_slider() {
+        $sidebars_widgets = wp_get_sidebars_widgets();
+        
+        foreach ($sidebars_widgets as $sidebar => $widgets) {
+            if (!is_array($widgets)) {
+                continue;
+            }
+            
+            foreach ($widgets as $widget_id) {
+                $parsed_id = $this->parse_widget_id($widget_id);
+                if (!$parsed_id) {
+                    continue;
+                }
+                
+                $widget_instance = get_option('widget_' . $parsed_id['base_id']);
+                if (!$widget_instance || !isset($widget_instance[$parsed_id['number']]['content'])) {
+                    continue;
+                }
+                
+                $content = $widget_instance[$parsed_id['number']]['content'];
+                
+                // Check for our container class or columns block in widget content
+                if (strpos($content, 'ags-container') !== false || has_block('core/columns', $content)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    private function parse_widget_id($widget_id) {
+        if (preg_match('/^(.+)-(\d+)$/', $widget_id, $matches)) {
+            return [
+                'base_id' => $matches[1],
+                'number' => $matches[2]
+            ];
+        }
+        return false;
     }
 }

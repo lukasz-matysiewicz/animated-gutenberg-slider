@@ -1,52 +1,81 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const containers = document.querySelectorAll('.cgs-container .wp-block-column');
-    if (containers.length === 0) return;
+(function($) {
+    'use strict';
 
-    const settings = {
-        duration: Number(window.agsSettings.duration) || 30,
-        direction: window.agsSettings.direction || 'left',
-        useGrayscale: Boolean(window.agsSettings.useGrayscale)
+    const defaultSettings = window.agsSettings?.settings || {
+        duration: 30,
+        direction: 'left',
+        useGrayscale: true,
+        gapWidth: 40,
+        logoWidth: 150,
+        mobileLogoWidth: 100
     };
 
-    containers.forEach(container => {
-        const content = container.innerHTML;
-        container.innerHTML = content + content;
+    function initSlider() {
+        const containers = document.querySelectorAll('.ags-container .wp-block-column');
+        if (!containers.length) return;
 
-        container.querySelectorAll('img').forEach(img => {
-            if (settings.useGrayscale) {
-                img.style.filter = 'grayscale(1)';
-                img.style.transition = 'filter 0.3s ease-in-out';
-                img.addEventListener('mouseenter', () => img.style.filter = 'grayscale(0)');
-                img.addEventListener('mouseleave', () => img.style.filter = 'grayscale(1)');
-            } else {
-                img.style.filter = 'none';
+        containers.forEach(container => {
+            try {
+                const parentContainer = container.closest('.ags-container');
+                if (!parentContainer || container.hasAttribute('data-ags-initialized')) {
+                    return;
+                }
+
+                const settings = {
+                    direction: defaultSettings.direction,
+                    duration: defaultSettings.duration,
+                    useGrayscale: defaultSettings.useGrayscale,
+                    gapWidth: defaultSettings.gapWidth,
+                    logoWidth: defaultSettings.logoWidth
+                };
+
+                const originalImages = container.querySelectorAll('.wp-block-image');
+                const originalContent = container.innerHTML;
+
+                container.innerHTML = originalContent + originalContent;
+
+                const totalWidth = (settings.logoWidth * originalImages.length) + 
+                                 (settings.gapWidth * (originalImages.length - 1));
+
+                if (settings.useGrayscale) {
+                    container.querySelectorAll('img').forEach(img => {
+                        img.classList.add('grayscale');
+                    });
+                }
+
+                gsap.set(container, {
+                    x: settings.direction === 'left' ? 0 : -totalWidth
+                });
+
+                container.animation = gsap.to(container, {
+                    x: settings.direction === 'left' ? -totalWidth : 0,
+                    duration: settings.duration,
+                    ease: "none",
+                    repeat: -1
+                });
+
+                container.setAttribute('data-ags-initialized', 'true');
+
+            } catch (error) {
+                console.error('AGS Slider initialization error:', error);
             }
         });
+    }
 
-        gsap.set(container, {
-            x: settings.direction === 'left' ? '0%' : '-50%'
-        });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSlider);
+    } else {
+        initSlider();
+    }
 
-        gsap.killTweensOf(container);
-
-        const tween = gsap.to(container, {
-            x: settings.direction === 'left' ? '-50%' : '0%',
-            duration: settings.duration,
-            repeat: -1,
-            ease: "none",
-            paused: true
-        });
-
-        setTimeout(() => {
-            tween.play();
-        }, 100);
-
-        container.addEventListener('mouseenter', () => {
-            gsap.to(tween, { timeScale: 0, duration: 0.5 });
-        });
-
-        container.addEventListener('mouseleave', () => {
-            gsap.to(tween, { timeScale: 1, duration: 0.5 });
-        });
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            document.querySelectorAll('.wp-block-column[data-ags-initialized]')
+                .forEach(el => el.removeAttribute('data-ags-initialized'));
+            initSlider();
+        }, 250);
     });
-});
+
+})(jQuery);

@@ -1,70 +1,138 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 <div class="wrap ags-admin-wrap">
-    <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-    
-    <form method="post" action="options.php">
-        <?php 
-        settings_fields('ags_options');
-        
-        // Define all defaults
-        $defaults = [
-            'animation_duration' => 30,
-            'animation_direction' => 'left',
-            'use_grayscale' => true,
-            'gap_width' => 40,
-            'logo_width' => 150,
-            'mobile_logo_width' => 100
-        ];
-        
-        // Get settings with defaults
-        $settings = wp_parse_args(
-            get_option('ags_settings', []),
-            $defaults
-        );
-        ?>
+    <!-- Header Section -->
+    <div class="ags-header">
+        <img src="<?php echo esc_url(AGS_PLUGIN_URL . 'assets/images/logo-ags.webp'); ?>" 
+             alt="<?php echo esc_attr__('Animated Gutenberg Slider Logo', 'animated-gutenberg-slider'); ?>" 
+             class="ags-logo">
+        <h1 class="ags-admin-title"><?php esc_html_e('Animated Gutenberg Slider', 'animated-gutenberg-slider'); ?></h1>
+    </div>
 
-        <!-- Animation Settings -->
-        <div class="ags-section">
-            <h2><?php _e('Animation Settings', 'animated-gutenberg-slider'); ?></h2>
-            <table class="form-table">
-                <tr>
-                    <th><label for="animation_duration"><?php _e('Animation Duration / Speed (seconds)', 'animated-gutenberg-slider'); ?></label></th>
-                    <td><input type="number" id="animation_duration" name="ags_settings[animation_duration]" value="<?php echo esc_attr($settings['animation_duration']); ?>" min="1" max="60" class="small-text"></td>
-                </tr>
-                <tr>
-                    <th><?php _e('Animation Direction', 'animated-gutenberg-slider'); ?></th>
-                    <td>
-                        <label><input type="radio" name="ags_settings[animation_direction]" value="left" <?php checked($settings['animation_direction'], 'left'); ?>> <?php _e('Slide to Left', 'animated-gutenberg-slider'); ?></label><br>
-                        <label><input type="radio" name="ags_settings[animation_direction]" value="right" <?php checked($settings['animation_direction'], 'right'); ?>> <?php _e('Slide to Right', 'animated-gutenberg-slider'); ?></label>
-                    </td>
-                </tr>
-                <tr>
-                    <th><?php _e('Grayscale Effect', 'animated-gutenberg-slider'); ?></th>
-                    <td>
-                        <label><input type="checkbox" name="ags_settings[use_grayscale]" value="1" <?php checked($settings['use_grayscale'], true); ?>> <?php _e('Enable grayscale effect', 'animated-gutenberg-slider'); ?></label>
-                    </td>
-                </tr>
-            </table>
+    <form method="post" action="options.php" class="ags-form">
+        <?php settings_fields('ags_options'); ?>
+
+        <div class="ags-settings-content">
+            <!-- Preview Section -->
+            <div class="ags-preview-section">
+                <h2 class="ags-section-title">Live Preview</h2>
+                <div class="ags-preview-container">
+                    <div id="agsPreview" class="wp-block-gallery" 
+                        data-direction="<?php echo esc_attr($settings['animation_direction']); ?>"
+                        data-speed="<?php echo esc_attr($settings['animation_duration']); ?>"
+                        data-grayscale="<?php echo $settings['use_grayscale'] ? 'true' : 'false'; ?>">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Settings Section -->
+            <div class="ags-main-settings">
+                <div class="ags-section">
+                    <h2 class="ags-section-title"><?php esc_html_e('Animation Settings', 'animated-gutenberg-slider'); ?></h2>
+                    
+                    <div class="ags-input-group">
+                        <label class="ags-input-label" for="animation_duration">
+                            <?php esc_html_e('Animation Duration / Speed (seconds)', 'animated-gutenberg-slider'); ?>
+                        </label>
+                        <input type="number" 
+                               id="animation_duration" 
+                               name="ags_settings[animation_duration]" 
+                               value="<?php echo esc_attr($settings['animation_duration']); ?>" 
+                               min="1" 
+                               max="60" 
+                               class="ags-input">
+                    </div>
+
+                    <div class="ags-input-group">
+                        <span class="ags-input-label"><?php esc_html_e('Animation Direction', 'animated-gutenberg-slider'); ?></span>
+                        <div class="ags-radio-group">
+                            <label class="ags-radio-label">
+                                <input type="radio" 
+                                       name="ags_settings[animation_direction]" 
+                                       value="left" 
+                                       <?php checked($settings['animation_direction'], 'left'); ?>>
+                                <?php esc_html_e('Slide to Left', 'animated-gutenberg-slider'); ?>
+                            </label>
+                            <label class="ags-radio-label">
+                                <input type="radio" 
+                                       name="ags_settings[animation_direction]" 
+                                       value="right" 
+                                       <?php checked($settings['animation_direction'], 'right'); ?>>
+                                <?php esc_html_e('Slide to Right', 'animated-gutenberg-slider'); ?>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="ags-input-group">
+                        <span class="ags-input-label"><?php esc_html_e('Grayscale Effect', 'animated-gutenberg-slider'); ?></span>
+                        <div class="ags-checkbox-group">
+                            <label class="ags-checkbox-label">
+                                <input type="checkbox" 
+                                       name="ags_settings[use_grayscale]" 
+                                       value="1" 
+                                       <?php checked($settings['use_grayscale'], true); ?>>
+                                <?php esc_html_e('Enable grayscale effect', 'animated-gutenberg-slider'); ?>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ags-section">
+                    <h2 class="ags-section-title"><?php esc_html_e('Slider Variables', 'animated-gutenberg-slider'); ?></h2>
+                    
+                    <div class="ags-input-group">
+                        <label class="ags-input-label" for="gap_width">
+                            <?php esc_html_e('Gap between Logos (px)', 'animated-gutenberg-slider'); ?>
+                        </label>
+                        <input type="number" 
+                               id="gap_width" 
+                               name="ags_settings[gap_width]" 
+                               value="<?php echo esc_attr($settings['gap_width']); ?>" 
+                               min="0" 
+                               max="100" 
+                               class="ags-input">
+                    </div>
+
+                    <div class="ags-input-group">
+                        <label class="ags-input-label" for="logo_width">
+                            <?php esc_html_e('Single Logo Width (px)', 'animated-gutenberg-slider'); ?>
+                        </label>
+                        <input type="number" 
+                               id="logo_width" 
+                               name="ags_settings[logo_width]" 
+                               value="<?php echo esc_attr($settings['logo_width']); ?>" 
+                               min="50" 
+                               max="500" 
+                               class="ags-input">
+                    </div>
+
+                    <div class="ags-input-group">
+                        <label class="ags-input-label" for="mobile_logo_width">
+                            <?php esc_html_e('Mobile Logo Width (px)', 'animated-gutenberg-slider'); ?>
+                        </label>
+                        <input type="number" 
+                               id="mobile_logo_width" 
+                               name="ags_settings[mobile_logo_width]" 
+                               value="<?php echo esc_attr($settings['mobile_logo_width']); ?>" 
+                               min="30" 
+                               max="300" 
+                               class="ags-input">
+                    </div>
+
+                    <?php submit_button(__('Save Changes', 'animated-gutenberg-slider'), 'primary ags-submit'); ?>
+                </div>
+            </div>
         </div>
-
-        <!-- Style Variables -->
-        <div class="ags-section">
-            <h2><?php _e('Slider Variables', 'animated-gutenberg-slider'); ?></h2>
-            <table class="form-table">
-                <tr>
-                    <th><label for="gap_width"><?php _e('Gap between Logos (px)', 'animated-gutenberg-slider'); ?></label></th>
-                    <td><input type="number" id="gap_width" name="ags_settings[gap_width]" value="<?php echo esc_attr($settings['gap_width']); ?>" min="0" max="100" class="small-text"></td>
-                </tr>
-                <tr>
-                    <th><label for="logo_width"><?php _e('Single Logo Width (px)', 'animated-gutenberg-slider'); ?></label></th>
-                    <td><input type="number" id="logo_width" name="ags_settings[logo_width]" value="<?php echo esc_attr($settings['logo_width']); ?>" min="50" max="500" class="small-text"></td>
-                </tr>
-                <tr>
-                    <th><label for="mobile_logo_width"><?php _e('Mobile Logo Width (px)', 'animated-gutenberg-slider'); ?></label></th>
-                    <td><input type="number" id="mobile_logo_width" name="ags_settings[mobile_logo_width]" value="<?php echo esc_attr($settings['mobile_logo_width']); ?>" min="30" max="300" class="small-text"></td>
-                </tr>
-            </table>
-        </div>
-
-        <?php submit_button(); ?>
     </form>
+
+    <footer class="ags-footer">
+        <p>
+            <?php esc_html_e('Need help? Contact support at', 'animated-gutenberg-slider'); ?>
+            <a href="mailto:support@matysiewicz.studio">support@matysiewicz.studio</a>
+        </p>
+    </footer>
 </div>

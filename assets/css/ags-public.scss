@@ -5,37 +5,42 @@ $mobile-logo-width: var(--ags-mobile-logo-width, 100px) !default;
 $transition-duration: 0.3s !default;
 
 // Main container
-.cgs-container {
-    margin: 0 auto;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
+.ags-container {
+    overflow: hidden !important;
+    width: 100% !important;
+    position: relative !important;
     
     .wp-block-column {
         display: flex !important;
-        flex-direction: row;
-        gap: $gap-width;
-        margin-bottom: -10px !important;
-    }
-    
-    .wp-block-image {
-        flex: 0 0 auto;
-        margin: 2em 0 !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: var(--ags-gap-width, 40px) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
+        will-change: transform;
         
-        img {
-            width: $logo-width !important;
-            object-fit: contain;
-            transition: filter $transition-duration ease-in-out;
+        .wp-block-image {
+            flex: 0 0 auto !important;
+            width: var(--ags-logo-width, 150px) !important;
+            margin: 2em 0 !important;
             
-            @media (max-width: 992px) {
-                width: $mobile-logo-width !important;
-            }
-            
-            &.grayscale {
-                filter: grayscale(1);
+            img {
+                width: 100% !important;
+                height: auto !important;
+                object-fit: contain !important;
+                transition: filter var(--ags-transition-duration, 0.3s) ease-in-out;
                 
-                &:hover {
-                    filter: grayscale(0);
+                @media (max-width: 992px) {
+                    width: var(--ags-mobile-logo-width, 100px) !important;
+                }
+                
+                &.grayscale {
+                    filter: grayscale(1);
+                    
+                    &:hover {
+                        filter: grayscale(0);
+                    }
                 }
             }
         }

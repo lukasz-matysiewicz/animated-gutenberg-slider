@@ -49,7 +49,7 @@ if ( ! function_exists( 'ags_fs' ) ) {
     do_action( 'ags_fs_loaded' );
 }
 
-define('AGS_VERSION', '1.0.0');
+define('AGS_VERSION', '1.0.1');
 define('AGS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AGS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
