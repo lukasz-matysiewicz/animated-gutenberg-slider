@@ -2,15 +2,14 @@
 /**
  * Plugin Name: Animated Gutenberg Slider
  * Plugin URI: https://matysiewicz.studio
- * Description: Create beautiful infinite sliders for Gutenberg columns
- * Version: 1.0.1
+ * Description: Create beautiful infinite sliders for Gutenberg columns. Transform your column blocks into smooth, professional sliders with GSAP animations. Perfect for logo carousels, partner showcases, and sliding content. Features include: infinite scrolling, grayscale effect, pause on hover, customizable speed and direction.
+ * Version: 1.0.3
  * Author: Matysiewicz Studio
  * Author URI: https://matysiewicz.studio
  * License: GPL v2 or later
  * Text Domain: animated-gutenberg-slider
  * Domain Path: /languages
  */
-
 if (!defined('WPINC')) {
     die;
 }
@@ -32,11 +31,26 @@ if ( ! function_exists( 'ags_fs' ) ) {
                 'has_addons'          => false,
                 'has_paid_plans'      => true,
                 'menu'                => array(
-                    'contact'      => false,
-                    'support'      => false,
-                    'pricing'      => false,
-                    'account'      => true,
+                    'slug'       => 'animated-gutenberg-slider',
+                    'contact'    => false,
+                    'support'    => false,
+                    'pricing'    => false,
+                    'account'    => true,
+                    'parent'     => array(
+                        'slug' => 'animated-gutenberg-slider',
+                    ),
                 ),
+                'is_live'            => true,
+                'premium_suffix'      => '',
+                'info'               => array(
+                    'description'     => 'Upgrade Animated Gutenberg Slider to sddd latest.',
+                    'short_description' => 'Create beautiful infinite sliders for Gutenberg columns. Transform your column blocks into smooth, professional sliders with GSAP animations. Perfect for logo carousels, partner showcases, and sliding content.',
+                    'author'          => 'Matysiewicz Studio',
+                    'author_uri'      => 'https://matysiewicz.studio',
+                    'plugin_uri'      => 'https://ags.matysiewicz.studio',
+                    'version'         => '1.0.1',
+                    'support_email'   => 'support@matysiewicz.studio',
+                )
             ) );
         }
 

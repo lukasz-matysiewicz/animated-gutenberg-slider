@@ -52,6 +52,22 @@
 
         // Start animation after a brief delay
         setTimeout(updateAnimation, 100);
+
+        // Add hover pause functionality
+        const container = preview.closest('.ags-preview-container');
+        if (container && settings.pauseOnHover) {
+            container.addEventListener('mouseenter', () => {
+                if (sliderAnimation) {
+                    sliderAnimation.pause();
+                }
+            });
+
+            container.addEventListener('mouseleave', () => {
+                if (sliderAnimation) {
+                    sliderAnimation.play();
+                }
+            });
+        }
     }
 
     function getSettings() {
@@ -60,7 +76,8 @@
             direction: $('input[name="ags_settings[animation_direction]"]:checked').val() || 'left',
             logoWidth: parseInt($('#logo_width').val()) || 150,
             gapWidth: parseInt($('#gap_width').val()) || 40,
-            useGrayscale: $('input[name="ags_settings[use_grayscale]"]').prop('checked')
+            useGrayscale: $('input[name="ags_settings[use_grayscale]"]').prop('checked'),
+            pauseOnHover: $('input[name="ags_settings[pause_on_hover]"]').prop('checked')
         };
     }
 
@@ -104,7 +121,7 @@
         });
 
         // Handle radio and checkbox changes
-        $('input[name="ags_settings[animation_direction]"], input[name="ags_settings[use_grayscale]"]').on('change', function() {
+        $('input[name="ags_settings[animation_direction]"], input[name="ags_settings[use_grayscale]"], input[name="ags_settings[pause_on_hover]"]').on('change', function() {
             initPreview();
         });
     });

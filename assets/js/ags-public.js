@@ -5,6 +5,7 @@
         duration: 30,
         direction: 'left',
         useGrayscale: true,
+        pauseOnHover: true,
         gapWidth: 40,
         logoWidth: 150,
         mobileLogoWidth: 100
@@ -25,6 +26,7 @@
                     direction: defaultSettings.direction,
                     duration: defaultSettings.duration,
                     useGrayscale: defaultSettings.useGrayscale,
+                    pauseOnHover: defaultSettings.pauseOnHover,
                     gapWidth: defaultSettings.gapWidth,
                     logoWidth: defaultSettings.logoWidth
                 };
@@ -53,6 +55,21 @@
                     ease: "none",
                     repeat: -1
                 });
+
+                // Add hover pause functionality
+                if (settings.pauseOnHover) {
+                    parentContainer.addEventListener('mouseenter', () => {
+                        if (container.animation) {
+                            container.animation.pause();
+                        }
+                    });
+
+                    parentContainer.addEventListener('mouseleave', () => {
+                        if (container.animation) {
+                            container.animation.play();
+                        }
+                    });
+                }
 
                 container.setAttribute('data-ags-initialized', 'true');
 

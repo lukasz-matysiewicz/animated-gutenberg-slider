@@ -36,7 +36,7 @@ if (!defined('ABSPATH')) {
                     
                     <div class="ags-input-group">
                         <label class="ags-input-label" for="animation_duration">
-                            <?php esc_html_e('Animation Duration / Speed (seconds)', 'animated-gutenberg-slider'); ?>
+                            <?php esc_html_e('Animation Duration (seconds) (depending on the number of logos)', 'animated-gutenberg-slider'); ?>
                         </label>
                         <input type="number" 
                                id="animation_duration" 
@@ -68,7 +68,7 @@ if (!defined('ABSPATH')) {
                     </div>
 
                     <div class="ags-input-group">
-                        <span class="ags-input-label"><?php esc_html_e('Grayscale Effect', 'animated-gutenberg-slider'); ?></span>
+                        <span class="ags-input-label"><?php esc_html_e('Effects', 'animated-gutenberg-slider'); ?></span>
                         <div class="ags-checkbox-group">
                             <label class="ags-checkbox-label">
                                 <input type="checkbox" 
@@ -76,6 +76,13 @@ if (!defined('ABSPATH')) {
                                        value="1" 
                                        <?php checked($settings['use_grayscale'], true); ?>>
                                 <?php esc_html_e('Enable grayscale effect', 'animated-gutenberg-slider'); ?>
+                            </label>
+                            <label class="ags-checkbox-label">
+                                <input type="checkbox" 
+                                       name="ags_settings[pause_on_hover]" 
+                                       value="1" 
+                                       <?php checked(isset($settings['pause_on_hover']) ? $settings['pause_on_hover'] : true, true); ?>>
+                                <?php esc_html_e('Pause on hover', 'animated-gutenberg-slider'); ?>
                             </label>
                         </div>
                     </div>

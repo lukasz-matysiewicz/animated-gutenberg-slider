@@ -16,16 +16,24 @@ class AGS_Assets {
             return;
         }
     
-        // Get settings
-        $settings = get_option('ags_settings', [
+        // Get settings with debug
+        $settings = get_option('ags_settings');
+        error_log('AGS Settings: ' . print_r($settings, true));
+
+        // Ensure defaults are set
+        $default_settings = [
             'animation_duration' => 30,
             'animation_direction' => 'left',
             'use_grayscale' => true,
+            'pause_on_hover' => true,
             'gap_width' => 40,
             'logo_width' => 150,
             'mobile_logo_width' => 100,
             'transition_duration' => 0.3
-        ]);
+        ];
+
+        // Merge with defaults
+        $settings = wp_parse_args($settings, $default_settings);
     
         // Register GSAP
         wp_register_script(
@@ -36,30 +44,10 @@ class AGS_Assets {
             true
         );
     
-        // Register plugin styles
-        wp_register_style(
-            'ags-public',
-            AGS_PLUGIN_URL . 'assets/css/ags-public.css',
-            [],
-            AGS_VERSION
-        );
-    
-        // Register plugin scripts
-        wp_register_script(
-            'ags-animations',
-            AGS_PLUGIN_URL . 'assets/js/ags-animations.js',
-            ['gsap'],
-            AGS_VERSION,
-            true
-        );
-    
-        wp_register_script(
-            'ags-public',
-            AGS_PLUGIN_URL . 'assets/js/ags-public.js',
-            ['jquery', 'gsap', 'ags-animations'],
-            AGS_VERSION,
-            true
-        );
+        // Register plugin styles and scripts
+        wp_register_style('ags-public', AGS_PLUGIN_URL . 'assets/css/ags-public.css', [], AGS_VERSION);
+        wp_register_script('ags-animations', AGS_PLUGIN_URL . 'assets/js/ags-animations.js', ['gsap'], AGS_VERSION, true);
+        wp_register_script('ags-public', AGS_PLUGIN_URL . 'assets/js/ags-public.js', ['jquery', 'gsap', 'ags-animations'], AGS_VERSION, true);
     
         // Enqueue all assets
         wp_enqueue_style('ags-public');
@@ -74,6 +62,7 @@ class AGS_Assets {
                 'duration' => intval($settings['animation_duration']),
                 'direction' => $settings['animation_direction'],
                 'useGrayscale' => (bool) $settings['use_grayscale'],
+                'pauseOnHover' => (bool) $settings['pause_on_hover'],
                 'gapWidth' => intval($settings['gap_width']),
                 'logoWidth' => intval($settings['logo_width']),
                 'mobileLogoWidth' => intval($settings['mobile_logo_width'])

@@ -33,7 +33,12 @@ class AGS_Admin {
                     'animation_duration' => 30,
                     'animation_direction' => 'left',
                     'use_grayscale' => true,
-                    'animation_style' => 'group'
+                    'pause_on_hover' => true,
+                    'animation_style' => 'group',
+                    'gap_width' => 40,
+                    'logo_width' => 150,
+                    'mobile_logo_width' => 100,
+                    'transition_duration' => 0.3
                 ]
             ]
         );
@@ -51,6 +56,7 @@ class AGS_Admin {
             $input['animation_direction'] : 'left';
         
         $sanitized['use_grayscale'] = !empty($input['use_grayscale']);
+        $sanitized['pause_on_hover'] = !empty($input['pause_on_hover']);
         
         // Style variables
         $sanitized['gap_width'] = isset($input['gap_width']) ? 
@@ -72,13 +78,21 @@ class AGS_Admin {
     }
 
     public function render_admin_page() {
-        // Get current settings
-        $settings = get_option('ags_settings', [
+        // Default settings
+        $default_settings = [
             'animation_duration' => 30,
             'animation_direction' => 'left',
             'use_grayscale' => true,
+            'pause_on_hover' => true,
+            'gap_width' => 40,
+            'logo_width' => 150,
+            'mobile_logo_width' => 100,
+            'transition_duration' => 0.3,
             'animation_style' => 'group'
-        ]);
+        ];
+        
+        // Get current settings and merge with defaults
+        $settings = wp_parse_args(get_option('ags_settings', []), $default_settings);
         
         // Include the admin view
         require_once AGS_PLUGIN_DIR . 'includes/admin/views/ags-admin.php';

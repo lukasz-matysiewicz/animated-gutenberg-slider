@@ -22,6 +22,7 @@ class AGS_Slider {
                 'animation_duration' => 30,
                 'animation_direction' => 'left',
                 'use_grayscale' => true,
+                'pause_on_hover' => true,
                 'gap_width' => 40,
                 'logo_width' => 150,
                 'mobile_logo_width' => 100,
