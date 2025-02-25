@@ -2,7 +2,7 @@
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.0
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 **License:** Commercial License ([See License Terms](#licensing))  
 
 # Animated Gutenberg Slider
@@ -77,7 +77,7 @@ This plugin is sold under a **Commercial License** and requires a valid **Freemi
 - **Annual License:** Includes **1 year of updates & support** (must renew to continue receiving updates)
 - **Lifetime License:** Includes **lifetime updates & support** (one-time payment)
 
-🔹 Your license can be **managed in your account** at your-url-site/wp-admin/admin.php?page=animated-gutenberg-slider-account
+🔹 Your license can be **managed in your account** at https://matysiewicz.studio/my-account/
 🔹 Licenses can be **moved between sites** via the **Freemius dashboard**  
 
 📜 **Read full license terms in LICENSE.txt**  
@@ -88,6 +88,7 @@ For support inquiries:
 - Website: https://matysiewicz.studio
 
 ## Version History
+- 1.0.4: Added Contact
 - 1.0.3: Account changes, readme details
 - 1.0.2: Added pause on hover functionality
 - 1.0.1: Added Freemius functionality
