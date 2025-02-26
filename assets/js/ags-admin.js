@@ -2,6 +2,7 @@
     'use strict';
 
     let sliderAnimation;
+    let pauseOnHoverHandlers = {};
 
     function initPreview() {
         const preview = document.getElementById('agsPreview');
@@ -48,25 +49,44 @@
             preview.querySelectorAll('img').forEach(img => {
                 img.style.filter = 'grayscale(100%)';
             });
+        } else {
+            preview.querySelectorAll('img').forEach(img => {
+                img.style.filter = 'none';
+            });
         }
 
         // Start animation after a brief delay
         setTimeout(updateAnimation, 100);
 
-        // Add hover pause functionality
+        // Get container for pause on hover
         const container = preview.closest('.ags-preview-container');
+        
+        // First remove any existing event listeners
+        if (pauseOnHoverHandlers.mouseenter) {
+            container.removeEventListener('mouseenter', pauseOnHoverHandlers.mouseenter);
+        }
+        if (pauseOnHoverHandlers.mouseleave) {
+            container.removeEventListener('mouseleave', pauseOnHoverHandlers.mouseleave);
+        }
+        
+        // Only add event listeners if pauseOnHover is enabled
         if (container && settings.pauseOnHover) {
-            container.addEventListener('mouseenter', () => {
+            // Define the handlers
+            pauseOnHoverHandlers.mouseenter = () => {
                 if (sliderAnimation) {
                     sliderAnimation.pause();
                 }
-            });
-
-            container.addEventListener('mouseleave', () => {
+            };
+            
+            pauseOnHoverHandlers.mouseleave = () => {
                 if (sliderAnimation) {
                     sliderAnimation.play();
                 }
-            });
+            };
+            
+            // Add the event listeners
+            container.addEventListener('mouseenter', pauseOnHoverHandlers.mouseenter);
+            container.addEventListener('mouseleave', pauseOnHoverHandlers.mouseleave);
         }
     }
 

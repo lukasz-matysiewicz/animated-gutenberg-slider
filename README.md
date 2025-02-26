@@ -2,7 +2,7 @@
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.0
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 **License:** Commercial License ([See License Terms](#licensing))  
 
 # Animated Gutenberg Slider
@@ -88,6 +88,7 @@ For support inquiries:
 - Website: https://matysiewicz.studio
 
 ## Version History
+- 1.0.5: Fixed bug with resize window - speed calculation
 - 1.0.4: Added Contact
 - 1.0.3: Account changes, readme details
 - 1.0.2: Added pause on hover functionality

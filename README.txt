@@ -5,7 +5,7 @@ Tags: slider, carousel, gutenberg, animation, logo slider, infinite scroll
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: Commercial
 
 Upgrade Animated Gutenberg Slider to latest.
@@ -36,6 +36,9 @@ Contact us at support@matysiewicz.studio for any support queries.
 2. Frontend slider example
 
 == Changelog ==
+
+= 1.0.5 =
+* Fixed bug with resize window - speed calculation
 
 = 1.0.4 =
 * Added Contact

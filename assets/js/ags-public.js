@@ -11,6 +11,9 @@
         mobileLogoWidth: 100
     };
 
+    // Keep track of initialized sliders
+    const initializedSliders = new Map();
+
     function initSlider() {
         const containers = document.querySelectorAll('.ags-container .wp-block-column');
         if (!containers.length) return;
@@ -18,8 +21,21 @@
         containers.forEach(container => {
             try {
                 const parentContainer = container.closest('.ags-container');
-                if (!parentContainer || container.hasAttribute('data-ags-initialized')) {
+                if (!parentContainer) {
                     return;
+                }
+
+                // Check if this container was previously initialized
+                if (initializedSliders.has(container)) {
+                    // Clean up the old animation before reinitializing
+                    const animation = initializedSliders.get(container);
+                    if (animation) {
+                        animation.kill();
+                    }
+                    
+                    // Reset container to original state
+                    container.innerHTML = container.getAttribute('data-original-content') || container.innerHTML;
+                    gsap.set(container, { x: 0 }); // Reset position
                 }
 
                 const settings = {
@@ -31,9 +47,14 @@
                     logoWidth: defaultSettings.logoWidth
                 };
 
-                const originalImages = container.querySelectorAll('.wp-block-image');
+                // Store original content before duplicating
                 const originalContent = container.innerHTML;
+                container.setAttribute('data-original-content', originalContent);
 
+                // Get original images before duplicating content
+                const originalImages = container.querySelectorAll('.wp-block-image');
+                
+                // Double the content for the infinite effect
                 container.innerHTML = originalContent + originalContent;
 
                 const totalWidth = (settings.logoWidth * originalImages.length) + 
@@ -49,26 +70,54 @@
                     x: settings.direction === 'left' ? 0 : -totalWidth
                 });
 
-                container.animation = gsap.to(container, {
+                const animation = gsap.to(container, {
                     x: settings.direction === 'left' ? -totalWidth : 0,
                     duration: settings.duration,
                     ease: "none",
                     repeat: -1
                 });
 
-                // Add hover pause functionality
-                if (settings.pauseOnHover) {
-                    parentContainer.addEventListener('mouseenter', () => {
-                        if (container.animation) {
-                            container.animation.pause();
-                        }
-                    });
+                // Store the animation in our Map
+                initializedSliders.set(container, animation);
 
-                    parentContainer.addEventListener('mouseleave', () => {
-                        if (container.animation) {
-                            container.animation.play();
+                // Clean up previous event listeners
+                const oldMouseEnter = container.getAttribute('data-mouseenter-handler');
+                const oldMouseLeave = container.getAttribute('data-mouseleave-handler');
+                
+                if (oldMouseEnter) {
+                    parentContainer.removeEventListener('mouseenter', window[oldMouseEnter]);
+                }
+                
+                if (oldMouseLeave) {
+                    parentContainer.removeEventListener('mouseleave', window[oldMouseLeave]);
+                }
+
+                // Add hover pause functionality with namespaced handlers
+                if (settings.pauseOnHover) {
+                    // Create unique handler names
+                    const mouseEnterHandlerName = 'mouseEnter_' + Math.random().toString(36).substring(2, 9);
+                    const mouseLeaveHandlerName = 'mouseLeave_' + Math.random().toString(36).substring(2, 9);
+                    
+                    // Create handlers on the window object so they can be referenced by string
+                    window[mouseEnterHandlerName] = () => {
+                        if (animation) {
+                            animation.pause();
                         }
-                    });
+                    };
+                    
+                    window[mouseLeaveHandlerName] = () => {
+                        if (animation) {
+                            animation.play();
+                        }
+                    };
+                    
+                    // Store handler references for future cleanup
+                    container.setAttribute('data-mouseenter-handler', mouseEnterHandlerName);
+                    container.setAttribute('data-mouseleave-handler', mouseLeaveHandlerName);
+                    
+                    // Add event listeners
+                    parentContainer.addEventListener('mouseenter', window[mouseEnterHandlerName]);
+                    parentContainer.addEventListener('mouseleave', window[mouseLeaveHandlerName]);
                 }
 
                 container.setAttribute('data-ags-initialized', 'true');
@@ -85,14 +134,24 @@
         initSlider();
     }
 
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            document.querySelectorAll('.wp-block-column[data-ags-initialized]')
-                .forEach(el => el.removeAttribute('data-ags-initialized'));
-            initSlider();
-        }, 250);
-    });
+    // Debounce function to limit resize events
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Debounced resize handler
+    const handleResize = debounce(() => {
+        initSlider();
+    }, 250);
+
+    window.addEventListener('resize', handleResize);
 
 })(jQuery);
