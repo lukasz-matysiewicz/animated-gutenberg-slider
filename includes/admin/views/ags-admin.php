@@ -6,9 +6,14 @@ if (!defined('ABSPATH')) {
 <div class="wrap ags-admin-wrap">
     <!-- Header Section -->
     <div class="ags-header">
-        <img src="<?php echo esc_url(AGS_PLUGIN_URL . 'assets/images/logo-ags.webp'); ?>" 
-             alt="<?php echo esc_attr__('Animated Gutenberg Slider Logo', 'animated-gutenberg-slider'); ?>" 
-             class="ags-logo">
+        <span class="ags-logo" aria-label="<?php echo esc_attr__('Animated Gutenberg Slider Logo', 'animated-gutenberg-slider'); ?>">
+            <!-- Inline SVG logo -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+                <path fill="#b30026" d="M25,2C12.3,2,2,12.3,2,25s10.3,23,23,23s23-10.3,23-23S37.7,2,25,2z"/>
+                <path fill="#ffffff" d="M34,34H16V16h18V34z M18,32h14V18H18V32z"/>
+                <path fill="#ffffff" d="M22,22h6v6h-6V22z"/>
+            </svg>
+        </span>
         <h1 class="ags-admin-title"><?php esc_html_e('Animated Gutenberg Slider', 'animated-gutenberg-slider'); ?></h1>
     </div>
 
@@ -18,12 +23,12 @@ if (!defined('ABSPATH')) {
         <div class="ags-settings-content">
             <!-- Preview Section -->
             <div class="ags-preview-section">
-                <h2 class="ags-section-title">Live Preview</h2>
+                <h2 class="ags-section-title"><?php esc_html_e('Live Preview', 'animated-gutenberg-slider'); ?></h2>
                 <div class="ags-preview-container">
                     <div id="agsPreview" class="wp-block-gallery" 
                         data-direction="<?php echo esc_attr($settings['animation_direction']); ?>"
                         data-speed="<?php echo esc_attr($settings['animation_duration']); ?>"
-                        data-grayscale="<?php echo $settings['use_grayscale'] ? 'true' : 'false'; ?>">
+                        data-grayscale="<?php echo esc_attr($settings['use_grayscale'] ? 'true' : 'false'); ?>">
                         <!-- Content will be populated by JavaScript -->
                     </div>
                 </div>
@@ -139,7 +144,9 @@ if (!defined('ABSPATH')) {
     <footer class="ags-footer">
         <p>
             <?php esc_html_e('Need help? Contact support at', 'animated-gutenberg-slider'); ?>
-            <a href="mailto:support@matysiewicz.studio">support@matysiewicz.studio</a>
+            <a href="<?php echo esc_url('mailto:support@matysiewicz.studio'); ?>">
+                <?php echo esc_html('support@matysiewicz.studio'); ?>
+            </a>
         </p>
     </footer>
 </div>

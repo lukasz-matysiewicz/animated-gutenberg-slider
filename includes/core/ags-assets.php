@@ -3,10 +3,13 @@ namespace AGS\Core;
 if (!defined('ABSPATH')) {
     exit('Direct access not allowed.');
 }
+
 class AGS_Assets {
     private $gsap_version = '3.12.2';
+    private $error_handler;
 
     public function __construct() {
+        $this->error_handler = AGS_Error_Handler::get_instance();
         add_action('wp_enqueue_scripts', [$this, 'register_frontend_assets']);
         add_action('admin_enqueue_scripts', [$this, 'register_admin_assets']);
     }
@@ -16,9 +19,11 @@ class AGS_Assets {
             return;
         }
     
-        // Get settings with debug
+        // Get settings
         $settings = get_option('ags_settings');
-        error_log('AGS Settings: ' . print_r($settings, true));
+        
+        // Log settings in a PHPCS-friendly way
+        $this->error_handler->log_error('AGS Settings loaded', $settings, 'info');
 
         // Ensure defaults are set
         $default_settings = [
@@ -35,10 +40,10 @@ class AGS_Assets {
         // Merge with defaults
         $settings = wp_parse_args($settings, $default_settings);
     
-        // Register GSAP
+        // Register GSAP from local vendor folder
         wp_register_script(
             'gsap',
-            'https://cdnjs.cloudflare.com/ajax/libs/gsap/' . $this->gsap_version . '/gsap.min.js',
+            AGS_PLUGIN_URL . 'assets/js/vendor/gsap.min.js',
             [],
             $this->gsap_version,
             true
@@ -75,17 +80,14 @@ class AGS_Assets {
             return;
         }
 
-        // Register and enqueue GSAP first
+        // Register GSAP from local vendor folder
         wp_register_script(
             'gsap',
-            'https://cdnjs.cloudflare.com/ajax/libs/gsap/' . $this->gsap_version . '/gsap.min.js',
+            AGS_PLUGIN_URL . 'assets/js/vendor/gsap.min.js',
             [],
             $this->gsap_version,
             true
         );
-
-        // Add GSAP fallback
-        wp_add_inline_script('gsap', $this->get_gsap_fallback_script(), 'before');
 
         // Register admin styles
         wp_enqueue_style(
@@ -109,19 +111,6 @@ class AGS_Assets {
         wp_localize_script('ags-admin', 'agsSettings', [
             'pluginUrl' => AGS_PLUGIN_URL
         ]);
-    }
-
-    private function get_gsap_fallback_script() {
-        return "
-            window.addEventListener('error', function(e) {
-                if (e.target.src && e.target.src.includes('cdnjs.cloudflare.com/ajax/libs/gsap')) {
-                    var script = document.createElement('script');
-                    script.src = '" . AGS_PLUGIN_URL . "assets/js/fallback/gsap.min.js';
-                    document.head.appendChild(script);
-                    e.preventDefault();
-                }
-            }, true);
-        ";
     }
 
     private function should_load_gallery_assets() {

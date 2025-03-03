@@ -3,7 +3,7 @@
  * Plugin Name: Animated Gutenberg Slider
  * Plugin URI: https://matysiewicz.studio
  * Description: Create beautiful infinite sliders for Gutenberg columns. Transform your column blocks into smooth, professional sliders with GSAP animations. Perfect for logo carousels, partner showcases, and sliding content. Features include: infinite scrolling, grayscale effect, pause on hover, customizable speed and direction.
- * Version: 1.0.5
+ * Version: 1.0.6
  * Author: Matysiewicz Studio
  * Author URI: https://matysiewicz.studio
  * License: GPL v2 or later
@@ -48,7 +48,7 @@ if ( ! function_exists( 'ags_fs' ) ) {
                     'author'          => 'Matysiewicz Studio',
                     'author_uri'      => 'https://matysiewicz.studio',
                     'plugin_uri'      => 'https://ags.matysiewicz.studio',
-                    'version'         => '1.0.5',
+                    'version'         => '1.0.6',
                     'support_email'   => 'support@matysiewicz.studio',
                 )
             ) );
@@ -63,9 +63,10 @@ if ( ! function_exists( 'ags_fs' ) ) {
     do_action( 'ags_fs_loaded' );
 }
 
-define('AGS_VERSION', '1.0.5');
+define('AGS_VERSION', '1.0.6');
 define('AGS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AGS_PLUGIN_URL', plugin_dir_url(__FILE__));
+// define('AGS_DEBUG', false);
 
 // Initialize the plugin
 require_once AGS_PLUGIN_DIR . 'includes/core/ags-init.php';
