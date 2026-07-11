@@ -76,7 +76,7 @@ The bundled [GSAP](https://gsap.com) library is distributed under its own (free)
 ## Support
 
 - Issues: [GitHub issue tracker](https://github.com/lukasz-matysiewicz/animated-gutenberg-slider/issues)
-- Email: support@matysiewicz.studio
+- Email: lukasz@matysiewicz.studio
 - Website: https://matysiewicz.studio
 
 ## Version History
