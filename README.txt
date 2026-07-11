@@ -5,26 +5,28 @@ Tags: slider, carousel, gutenberg, animation, logo slider, infinite scroll
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.6
-License: Commercial
+Stable tag: 1.1.0
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Upgrade Animated Gutenberg Slider to latest.
+Create beautiful infinite sliders for Gutenberg columns with GSAP animations.
 
 == Description ==
 
-Upgrade Animated Gutenberg Slider to latest.
+Create beautiful infinite sliders for Gutenberg columns. Transform your column blocks into smooth, professional sliders with GSAP animations. Perfect for logo carousels, partner showcases, and sliding content. Features include: infinite scrolling, grayscale effect, pause on hover, customizable speed and direction.
 
 == Installation ==
 
 1. Upload `animated-gutenberg-slider` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Enter your license key to enable updates and support
+3. Add the CSS class `ags-container` to any Columns block (Settings > Advanced > Additional CSS class(es))
+4. Customize the slider in the AG Slider admin menu
 
 == Frequently Asked Questions ==
 
 = Can I use this plugin on multiple sites? =
 
-This depends on your license type. Single-site license allows usage on one site, while unlimited license allows usage on multiple sites.
+Yes. The plugin is free and licensed under GPLv2 or later — use it on as many sites as you like.
 
 = How do I get support? =
 
@@ -36,6 +38,14 @@ Contact us at support@matysiewicz.studio for any support queries.
 2. Frontend slider example
 
 == Changelog ==
+
+= 1.1.0 =
+* Removed Freemius - the plugin is now free and open source (GPLv2 or later)
+* Fixed activation/deactivation hooks not being registered
+* Removed broken and dead code
+* Assets now load only on pages that actually use the slider
+* Slider settings (gap, logo width, transition) applied via CSS custom properties
+* Fixed event-handler leak on window resize
 
 = 1.0.6 =
 * wp security checks
@@ -60,5 +70,5 @@ Contact us at support@matysiewicz.studio for any support queries.
 
 == Upgrade Notice ==
 
-= 1.0.1 =
-This version adds Freemius integration for better licensing and updates.
+= 1.1.0 =
+The plugin is now free and open source (GPLv2 or later). No license key is required.

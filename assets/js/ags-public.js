@@ -1,4 +1,4 @@
-(function($) {
+(function() {
     'use strict';
 
     const defaultSettings = window.agsSettings?.settings || {
@@ -11,7 +11,7 @@
         mobileLogoWidth: 100
     };
 
-    // Keep track of initialized sliders
+    // Keep track of initialized sliders: container -> { animation, listeners, parent }
     const initializedSliders = new Map();
 
     function initSlider() {
@@ -25,17 +25,18 @@
                     return;
                 }
 
-                // Check if this container was previously initialized
-                if (initializedSliders.has(container)) {
-                    // Clean up the old animation before reinitializing
-                    const animation = initializedSliders.get(container);
-                    if (animation) {
-                        animation.kill();
+                // Clean up a previous initialization (e.g. after a resize)
+                const previous = initializedSliders.get(container);
+                if (previous) {
+                    if (previous.animation) {
+                        previous.animation.kill();
                     }
-                    
-                    // Reset container to original state
+                    previous.listeners.forEach(([event, handler]) => {
+                        previous.parent.removeEventListener(event, handler);
+                    });
                     container.innerHTML = container.getAttribute('data-original-content') || container.innerHTML;
-                    gsap.set(container, { x: 0 }); // Reset position
+                    gsap.set(container, { x: 0 });
+                    initializedSliders.delete(container);
                 }
 
                 const settings = {
@@ -53,11 +54,11 @@
 
                 // Get original images before duplicating content
                 const originalImages = container.querySelectorAll('.wp-block-image');
-                
+
                 // Double the content for the infinite effect
                 container.innerHTML = originalContent + originalContent;
 
-                const totalWidth = (settings.logoWidth * originalImages.length) + 
+                const totalWidth = (settings.logoWidth * originalImages.length) +
                                  (settings.gapWidth * (originalImages.length - 1));
 
                 if (settings.useGrayscale) {
@@ -77,48 +78,23 @@
                     repeat: -1
                 });
 
-                // Store the animation in our Map
-                initializedSliders.set(container, animation);
-
-                // Clean up previous event listeners
-                const oldMouseEnter = container.getAttribute('data-mouseenter-handler');
-                const oldMouseLeave = container.getAttribute('data-mouseleave-handler');
-                
-                if (oldMouseEnter) {
-                    parentContainer.removeEventListener('mouseenter', window[oldMouseEnter]);
-                }
-                
-                if (oldMouseLeave) {
-                    parentContainer.removeEventListener('mouseleave', window[oldMouseLeave]);
-                }
-
-                // Add hover pause functionality with namespaced handlers
+                // Add hover pause functionality
+                const listeners = [];
                 if (settings.pauseOnHover) {
-                    // Create unique handler names
-                    const mouseEnterHandlerName = 'mouseEnter_' + Math.random().toString(36).substring(2, 9);
-                    const mouseLeaveHandlerName = 'mouseLeave_' + Math.random().toString(36).substring(2, 9);
-                    
-                    // Create handlers on the window object so they can be referenced by string
-                    window[mouseEnterHandlerName] = () => {
-                        if (animation) {
-                            animation.pause();
-                        }
-                    };
-                    
-                    window[mouseLeaveHandlerName] = () => {
-                        if (animation) {
-                            animation.play();
-                        }
-                    };
-                    
-                    // Store handler references for future cleanup
-                    container.setAttribute('data-mouseenter-handler', mouseEnterHandlerName);
-                    container.setAttribute('data-mouseleave-handler', mouseLeaveHandlerName);
-                    
-                    // Add event listeners
-                    parentContainer.addEventListener('mouseenter', window[mouseEnterHandlerName]);
-                    parentContainer.addEventListener('mouseleave', window[mouseLeaveHandlerName]);
+                    const onMouseEnter = () => animation.pause();
+                    const onMouseLeave = () => animation.play();
+
+                    parentContainer.addEventListener('mouseenter', onMouseEnter);
+                    parentContainer.addEventListener('mouseleave', onMouseLeave);
+
+                    listeners.push(['mouseenter', onMouseEnter], ['mouseleave', onMouseLeave]);
                 }
+
+                initializedSliders.set(container, {
+                    animation: animation,
+                    listeners: listeners,
+                    parent: parentContainer
+                });
 
                 container.setAttribute('data-ags-initialized', 'true');
 
@@ -154,4 +130,4 @@
 
     window.addEventListener('resize', handleResize);
 
-})(jQuery);
+})();

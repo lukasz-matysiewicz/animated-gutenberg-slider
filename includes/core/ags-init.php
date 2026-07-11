@@ -14,8 +14,7 @@ class AGS_Init {
 
     private function load_dependencies() {
         require_once AGS_PLUGIN_DIR . 'includes/core/ags-assets.php';
-        require_once AGS_PLUGIN_DIR . 'includes/core/ags-error-handler.php';
-        
+
         if (is_admin()) {
             require_once AGS_PLUGIN_DIR . 'includes/admin/ags-admin.php';
         }
